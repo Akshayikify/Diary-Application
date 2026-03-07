@@ -15,6 +15,8 @@ public class DiaryEntry {
 
     private String sentiment;
 
+    private String username;
+
     public String getId() {
         return id;
     }
@@ -46,4 +48,8 @@ public class DiaryEntry {
     public void setSentiment(String sentiment) {
         this.sentiment = sentiment;
     }
+
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
 }

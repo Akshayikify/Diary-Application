@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Dashboard</title>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white">
+<div class="container-fluid">
+
+<a class="navbar-brand" th:href="@{/dashboard}">DiaryNate</a>
+
+<div class="d-flex">
+
+<form th:action="@{/logout}" method="post">
+  <button type="submit" class="btn btn-primary logout-btn">Logout</button>
+</form>
+
+</div>
+
+</div>
+</nav>
+
+
+<div class="main-container">
+
+<h2 class="page-title">Your Diaries</h2>
+
+<a class="btn btn-success create-btn" href="/new">Create Diary</a>
+
+<div th:each="d : ${diaries}" class="diary-card">
+
+<div class="diary-title" th:text="${d.title}"></div>
+
+<p th:text="${d.content}"></p>
+
+<span th:text="${d.sentiment}"
+      th:classappend="${d.sentiment=='Positive'} ? 'sentiment-positive' : 'sentiment-negative'">
+</span>
+
+</div>
+
+</div>
+
+</body>
+</html>
