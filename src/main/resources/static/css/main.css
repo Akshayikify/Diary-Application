@@ -1,0 +1,74 @@
+/* General */
+body{
+    font-family: 'Segoe UI', sans-serif;
+    background:#f4f6fb;
+}
+
+/* Ensure logout button is always visible */
+.navbar .btn-primary {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Navbar */
+.navbar{
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Hero section */
+.hero{
+    background:linear-gradient(120deg,#667eea,#764ba2);
+    color:white;
+    padding:80px 0;
+    text-align:center;
+}
+
+.hero h1{
+    font-weight:bold;
+}
+
+/* Main container */
+.main-container{
+    margin-top:40px;
+}
+
+/* Diary cards */
+.diary-card{
+    border:none;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    transition:0.2s;
+}
+
+.diary-card:hover{
+    transform:translateY(-4px);
+}
+
+/* Sentiment badges */
+.sentiment-positive{
+    background:#28a745;
+}
+
+.sentiment-negative{
+    background:#dc3545;
+}
+
+/* About section */
+.about{
+    background:white;
+    padding:60px 0;
+}
+
+/* Footer */
+.footer{
+    background:#1c1c1c;
+    color:white;
+    padding:20px 0;
+    text-align:center;
+    margin-top:40px;
+}
+
+.footer a{
+    color:#ccc;
+    text-decoration:none;
+}

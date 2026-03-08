@@ -2,12 +2,14 @@ package com.diaryapp.diaryapp.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -66,6 +68,38 @@ public class WebController {
         entry.setContent(content);
         entry.setUsername(principal.getName());
         diaryRepo.save(entry);
+        return "redirect:/dashboard";
+    }
+
+    @GetMapping("/view/{id}")
+    public String viewDiary(@PathVariable String id, Model model) {
+        Optional<DiaryEntry> entry = diaryRepo.findById(id);
+        entry.ifPresent(e -> model.addAttribute("diary", e));
+        return "view-diary";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editDiary(@PathVariable String id, Model model) {
+        Optional<DiaryEntry> entry = diaryRepo.findById(id);
+        entry.ifPresent(e -> model.addAttribute("diary", e));
+        return "edit-diary";
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateDiary(@PathVariable String id, @RequestParam String title, @RequestParam String content) {
+        Optional<DiaryEntry> optional = diaryRepo.findById(id);
+        if (optional.isPresent()) {
+            DiaryEntry entry = optional.get();
+            entry.setTitle(title);
+            entry.setContent(content);
+            diaryRepo.save(entry);
+        }
+        return "redirect:/dashboard";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteDiary(@PathVariable String id) {
+        diaryRepo.deleteById(id);
         return "redirect:/dashboard";
     }
 }
