@@ -1,21 +1,16 @@
-name: Java Spring Boot CI/CD
+name: Diary Application Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -24,32 +19,17 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Make mvnw executable
+      - name: Grant execute permission for mvnw
         run: chmod +x mvnw
 
-      - name: Build with Maven
-        run: ./mvnw -B package --file pom.xml -DskipTests
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Lowercase repository name
-        run: echo "IMAGE_ID=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/${{ env.IMAGE_ID }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Build with Maven, retrying on failure
+        run: |
+          attempt=0
+          while [ $attempt -lt 3 ]; do
+            ./mvnw -B package --file pom.xml -DskipTests && exit 0
+            attempt=$((attempt+1))
+            echo "Attempt $attempt failed. Waiting 10 seconds before retrying..."
+            sleep 10
+          done
+          echo "All build attempts failed."
+          exit 1
