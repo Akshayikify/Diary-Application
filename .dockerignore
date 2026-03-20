@@ -1,6 +1,0 @@
-.git
-target/
-*.class
-.mvn/
-mvnw
-mvnw.cmd
