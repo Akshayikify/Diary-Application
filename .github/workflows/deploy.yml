@@ -1,35 +1,24 @@
-name: Diary Application Deployment
+name: Deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
 
-      - name: Grant execute permission for mvnw
-        run: chmod +x mvnw
-
-      - name: Build with Maven, retrying on failure
-        run: |
-          attempt=0
-          while [ $attempt -lt 3 ]; do
-            ./mvnw -B package --file pom.xml -DskipTests && exit 0
-            attempt=$((attempt+1))
-            echo "Attempt $attempt failed. Waiting 10 seconds before retrying..."
-            sleep 10
-          done
-          echo "All build attempts failed."
-          exit 1
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml -DskipTests
