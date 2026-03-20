@@ -1,4 +1,5 @@
-FROM eclipse-temurin:17-alpine AS builder
+FROM eclipse-temurin:17-alpine
+
 WORKDIR /app
 
 COPY .mvn ./.mvn
@@ -7,13 +8,12 @@ COPY mvnw.cmd ./mvnw.cmd
 COPY pom.xml ./pom.xml
 COPY src ./src
 
+RUN chmod +x ./mvnw
+RUN ./mvnw dependency:go-offline
 RUN ./mvnw package -DskipTests
 
 FROM eclipse-temurin:17-alpine
 WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
-
+COPY --from=0 /app/target/*.jar app.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
