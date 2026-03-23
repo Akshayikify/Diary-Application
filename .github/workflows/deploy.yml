@@ -1,4 +1,4 @@
-name: Deploy Diary Application
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,24 +20,20 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-          logout: true
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Extract metadata (tags, labels) for Docker image
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/Akshayikify/Diary-Application/diary-application
-          tags: type=sha,prefix=latest-
-                type=ref,event=branch
-          context: workflow
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          images: ghcr.io/${{ github.repository }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Deploy to GitHub Pages
+        run: echo "Deploying..."
