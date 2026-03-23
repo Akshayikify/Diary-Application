@@ -3,11 +3,18 @@ FROM eclipse-temurin:17-jdk-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application's JAR file into the container
-COPY target/*.jar app.jar
+# Copy the pom.xml file to download dependencies
+COPY pom.xml .
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Download dependencies (use a separate layer for caching)
+RUN apt-get update && apt-get install -y maven
+RUN mvn dependency:go-offline -B
 
-# Define the command to run when the container starts
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Copy source code
+COPY src .
+
+# Package the application
+RUN mvn clean package -DskipTests
+
+# Command to run the application
+CMD ["java", "-jar", "target/diary-application-0.0.1-SNAPSHOT.jar"]
