@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Diary Application
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,18 +22,22 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata (labels, tags) for Docker image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # extract Docker tags from the git branch or tag
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=
+          flavor: latest=true
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          # automatically set the image name from the environment
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
-
-      - name: Extract metadata (tags, labels) for Docker image
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-
-      - name: Deploy to GitHub Pages
-        run: echo "Deploying..."
+          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ steps.meta.outputs.version }}
+          build-args:
+            PROFILE: prod
