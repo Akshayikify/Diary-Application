@@ -1,10 +1,11 @@
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM docker.io/library/eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
 COPY mvnw ./
 COPY mvnw.cmd ./
 COPY .mvn .mvn
 COPY src ./src
+RUN apk update && apk add --no-cache wget
 RUN if [ -f "./mvnw" ]; then ./mvnw package -DskipTests; else mvn package -DskipTests; fi
 
 FROM eclipse-temurin:17-jre-alpine
