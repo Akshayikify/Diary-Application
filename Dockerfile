@@ -1,28 +1,23 @@
-FROM eclipse-temurin:17-alpine
+FROM openjdk:17-jdk-slim
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY pom.xml .
-COPY mvnw ./
-COPY mvnw.cmd ./
-COPY .mvn .mvn
-COPY src ./src
+# Copy the application code into the container
+COPY . .
 
-RUN if [ -f "./mvnw" ]; then ./mvnw package -DskipTests; else mvn package -DskipTests; fi
+# Install Maven
+RUN apt-get update && apt-get install -y maven
 
-FROM eclipse-temurin:17-alpine
+# Set environment variables
+ENV MAVEN_HOME /usr/share/maven
+ENV PATH $MAVEN_HOME/bin:$PATH
 
-WORKDIR /app
+# Build the application using Maven
+RUN mvn package -DskipTests
 
-COPY pom.xml .
-COPY mvnw ./
-COPY mvnw.cmd ./
-COPY .mvn .mvn
-COPY src ./src
-RUN apk add --no-cache wget
-RUN wget https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.6/apache-maven-3.9.6-bin.zip -O /tmp/maven.zip
-RUN unzip /tmp/maven.zip -d /opt
-ENV MAVEN_HOME=/opt/apache-maven-3.9.6
-ENV PATH=$MAVEN_HOME/bin:$PATH
+# Expose port 8080 for the application
+EXPOSE 8080
 
-RUN if [ -f "./mvnw" ]; then ./mvnw package -DskipTests; else mvn package -DskipTests; fi
+# Command to run the application
+CMD ["java", "-jar", "target/*.jar"]
