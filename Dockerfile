@@ -1,23 +1,13 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application code into the container
-COPY . .
+# Copy the application's JAR file into the container
+COPY target/*.jar app.jar
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven
-
-# Set environment variables
-ENV MAVEN_HOME /usr/share/maven
-ENV PATH $MAVEN_HOME/bin:$PATH
-
-# Build the application using Maven
-RUN mvn package -DskipTests
-
-# Expose port 8080 for the application
+# Expose port 8080 to the outside world
 EXPOSE 8080
 
-# Command to run the application
-CMD ["java", "-jar", "target/*.jar"]
+# Define the command to run when the container starts
+ENTRYPOINT ["java", "-jar", "app.jar"]
